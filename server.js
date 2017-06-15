@@ -13,7 +13,7 @@ const app = express();
 
 // ==== FUNCTIONS ==== //
 /**
- * Extract the required data from the response
+ * Set the options for querying CR
  * @param  {Response} query Query from the url
  * @return {Object}     Options for the query to CR
  */
@@ -24,7 +24,7 @@ function setOptions(query) {
 			version: '1.0', // eslint-disable-line
 			access_token: 'Scwg9PRRZ19iVwD', // eslint-disable-line
 			device_type: 'com.crunchyroll.crunchyroid', // eslint-disable-line
-			device_id: Math.floor(Math.random() * 10000000) // eslint-disable-line
+			device_id: generateId() // eslint-disable-line
 		}
 	};
 	if (query.auth) {
@@ -34,7 +34,20 @@ function setOptions(query) {
 }
 
 /**
- * Emit a positive reply containing data
+ * Generate a random 32 character long device ID
+ * @return {String} Generated device ID
+ */
+function generateId() {
+	let id = '';
+	const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	for (var i = 0; i < 32; i++) {
+		id += possible.charAt(Math.floor(Math.random() * possible.length));
+	}
+	return id;
+}
+
+/**
+ * Emit a negative reply containing an error message
  * @param  {Object} res  Reply object
  * @param  {String} err Error message
  */
