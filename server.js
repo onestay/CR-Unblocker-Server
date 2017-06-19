@@ -75,7 +75,7 @@ app.enable('trust proxy');
 app.use(helmet());
 app.use(limiter);
 app.get('/start_session', (req, res) => {
-	if (req.query.version === '1.0') {
+	if (req.query.version === undefined || req.query.version === '1.0') {
 		let options = setOptions(req.query);
 		request(options, (error, response, body) => {
 			replySuccess(res, JSON.parse(body));
