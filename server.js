@@ -87,6 +87,9 @@ app.get('/start_session', (req, res) => {
 		replyError(res, 'Invalid API version specified.');
 	}
 });
+app.get('*', (req, res) => {
+	replyError(res, 'Invalid API endpoint.');
+});
 
 // process.env.PORT lets the port be set by Heroku
 var port = process.env.PORT || 3001; // eslint-disable-line
