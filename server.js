@@ -74,14 +74,18 @@ app.enable('trust proxy');
 // use the middleware
 app.use(helmet());
 app.use(limiter);
-app.get('*', (req, res) => {
-	let options = setOptions(req.query);
-	request(options, (error, response, body) => {
-		replySuccess(res, JSON.parse(body));
-	}).on('error', error => {
-		console.log(`Error fetching ${options.url}: ${error}`);
-		replyError(res, error);
-	});
+app.get('/start_session', (req, res) => {
+	if (req.query.version === '1.0') {
+		let options = setOptions(req.query);
+		request(options, (error, response, body) => {
+			replySuccess(res, JSON.parse(body));
+		}).on('error', error => {
+			console.log(`Error fetching ${options.url}: ${error}`);
+			replyError(res, error);
+		});
+	} else {
+		replyError(res, 'Invalid API version specified.');
+	}
 });
 
 // process.env.PORT lets the port be set by Heroku
