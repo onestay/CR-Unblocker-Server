@@ -94,9 +94,26 @@ app.get('/start_session', (req, res) => {
 	version = { major: parseInt(split[0]) || 0, minor: parseInt(split[1]) || 0 };
 
 	if (version.major === 1) {
+		if (version.minor <= 0 && req.query.auth) {
+			// version <= 1.0: only start_session without logging in is supported
+			replyError(res, 'Logging in with an auth token is disabled in this version.');
+			return;
+		} else if (version.minor >= 1 && req.query.auth && !req.query.user_id) {
+			// version >= 1.1: logging in with auth token requires user_id to match
+			replyError(res, 'Logging in with an auth token requires the user_id parameter.');
+			return;
+		}
 		let options = setOptions(req.query);
 		request(options, (error, response, body) => {
-			replySuccess(res, JSON.parse(body));
+			let data = JSON.parse(body);
+			if (data.error) {
+				replySuccess(res, data);
+			} else if (req.query.auth && data.data.user !== null && data.data.user.user_id !== req.query.user_id) {
+				// if auth is specified, require that user_id matches
+				replyError(res, 'Invalid user_id specified.');
+			} else {
+				replySuccess(res, data);
+			}
 		}).on('error', error => {
 			console.log(`Error fetching ${options.url}: ${error}`);
 			replyError(res, error);
