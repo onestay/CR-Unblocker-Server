@@ -71,8 +71,10 @@ function replySuccess(res, data) {
 // ==== ROUTING ==== //
 // support for reverse proxy
 app.enable('trust proxy');
+app.disable('view cache');
 // use the middleware
 app.use(helmet());
+app.use(helmet.noCache());
 app.use(limiter);
 app.get('/start_session', (req, res) => {
 	if (req.query.version === undefined || req.query.version === '1.0') {
