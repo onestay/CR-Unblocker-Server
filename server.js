@@ -10,6 +10,8 @@ const limiter = new RateLimit({
 });
 const app = express();
 
+const knownVersions = ['1.0', '1.1'];
+
 
 // ==== FUNCTIONS ==== //
 /**
@@ -77,7 +79,21 @@ app.use(helmet());
 app.use(helmet.noCache());
 app.use(limiter);
 app.get('/start_session', (req, res) => {
-	if (req.query.version === undefined || req.query.version === '1.0') {
+	// default version if none specified: 1.0
+	let version = req.query.version;
+	if (version === undefined) {
+		version = '1.0';
+	}
+	// validate version against whitelist
+	if (knownVersions.indexOf(version) === -1) {
+		replyError(res, 'Invalid API version specified.');
+		return;
+	}
+	// parse version into object containing minor and major version
+	let split = version.split('.');
+	version = { major: parseInt(split[0]) || 0, minor: parseInt(split[1]) || 0 };
+
+	if (version.major === 1) {
 		let options = setOptions(req.query);
 		request(options, (error, response, body) => {
 			replySuccess(res, JSON.parse(body));
@@ -85,8 +101,6 @@ app.get('/start_session', (req, res) => {
 			console.log(`Error fetching ${options.url}: ${error}`);
 			replyError(res, error);
 		});
-	} else {
-		replyError(res, 'Invalid API version specified.');
 	}
 });
 app.get('*', (req, res) => {
