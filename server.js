@@ -10,6 +10,8 @@ const limiter = new RateLimit({
 });
 const app = express();
 
+const knownVersions = ['1.0', '1.1'];
+
 
 // ==== FUNCTIONS ==== //
 /**
@@ -77,16 +79,45 @@ app.use(helmet());
 app.use(helmet.noCache());
 app.use(limiter);
 app.get('/start_session', (req, res) => {
-	if (req.query.version === undefined || req.query.version === '1.0') {
+	// default version if none specified: 1.0
+	let version = req.query.version;
+	if (version === undefined) {
+		version = '1.0';
+	}
+	// validate version against whitelist
+	if (knownVersions.indexOf(version) === -1) {
+		replyError(res, 'Invalid API version specified.');
+		return;
+	}
+	// parse version into object containing minor and major version
+	let split = version.split('.');
+	version = { major: parseInt(split[0]) || 0, minor: parseInt(split[1]) || 0 };
+
+	if (version.major === 1) {
+		if (version.minor <= 0 && req.query.auth) {
+			// version <= 1.0: only start_session without logging in is supported
+			replyError(res, 'Logging in with an auth token is disabled in this version.');
+			return;
+		} else if (version.minor >= 1 && req.query.auth && !req.query.user_id) {
+			// version >= 1.1: logging in with auth token requires user_id to match
+			replyError(res, 'Logging in with an auth token requires the user_id parameter.');
+			return;
+		}
 		let options = setOptions(req.query);
 		request(options, (error, response, body) => {
-			replySuccess(res, JSON.parse(body));
+			let data = JSON.parse(body);
+			if (data.error) {
+				replySuccess(res, data);
+			} else if (req.query.auth && data.data.user !== null && data.data.user.user_id !== req.query.user_id) {
+				// if auth is specified, require that user_id matches
+				replyError(res, 'Invalid user_id specified.');
+			} else {
+				replySuccess(res, data);
+			}
 		}).on('error', error => {
 			console.log(`Error fetching ${options.url}: ${error}`);
 			replyError(res, error);
 		});
-	} else {
-		replyError(res, 'Invalid API version specified.');
 	}
 });
 app.get('*', (req, res) => {
