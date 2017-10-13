@@ -18,6 +18,8 @@ If you are really concerned about security you can run it yourself. I will give 
 5. In the extension in src/background_script.js add `https://{your server URL}/start_session?version=1.0` to the `SERVERS` array and delete all other elements if you only want to use your server.
 6. Add the extension folder as an unpacked extension to your browser.
 
+or get the image from [docker](https://hub.docker.com/r/onestay/cr-unblocker-server/).  The server runs on port 3001.
+
 ## Extension repo
 The extension repo is [here](https://github.com/onestay/cr-unblocker)
 
