@@ -10,13 +10,12 @@
   "author": "Onestay",
   "license": "MIT",
   "dependencies": {
-    "cloudscraper": "^1.4.1",
-    "express": "^4.14.1",
-    "express-rate-limit": "^2.6.0",
-    "helmet": "^3.4.0",
-    "request": "^2.80.0"
+    "express": "^4.16.2",
+    "express-rate-limit": "^2.9.0",
+    "helmet": "^3.9.0",
+    "request": "^2.83.0"
   },
   "devDependencies": {
-    "eslint": "^3.15.0"
+    "eslint": "^4.8.0"
   }
 }
