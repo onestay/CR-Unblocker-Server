@@ -4,7 +4,7 @@ const request = require('request');
 const helmet = require('helmet');
 const RateLimit = require('express-rate-limit');
 const limiter = new RateLimit({
-	windowMs: 15 * 60 * 1000,
+	windowMs: 30 * 60 * 1000,
 	max: 20,
 	delayMs: 0
 });
