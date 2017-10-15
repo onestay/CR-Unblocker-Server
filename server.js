@@ -129,3 +129,5 @@ var port = process.env.PORT || 3001; // eslint-disable-line
 app.listen(port, () => {
 	console.log(`Listening on port ${port}`);
 });
+
+module.exports = app;

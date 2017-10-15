@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Linting\" && eslint *.js",
+    "test": "echo \"Testing\" && eslint *.js && mocha --timeout 10000 --exit",
     "start": "node server.js"
   },
   "author": "Onestay",
@@ -16,6 +16,9 @@
     "request": "^2.83.0"
   },
   "devDependencies": {
-    "eslint": "^4.8.0"
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "eslint": "^4.8.0",
+    "mocha": "^4.0.1"
   }
 }
