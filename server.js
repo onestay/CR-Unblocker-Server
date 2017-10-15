@@ -99,14 +99,19 @@ app.get('/start_session', (req, res) => {
 		}
 		let options = setOptions(req.query);
 		request(options, (error, response, body) => {
-			let data = JSON.parse(body);
-			if (data.error) {
-				replySuccess(res, data);
-			} else if (req.query.auth && data.data.user !== null && data.data.user.user_id !== req.query.user_id) {
-				// if auth is specified, require that user_id matches
-				replyError(res, 'Invalid user_id specified.');
-			} else {
-				replySuccess(res, data);
+			try {
+				let data = JSON.parse(body);
+				if (data.error) {
+					replySuccess(res, data);
+				} else if (req.query.auth && data.data.user !== null && data.data.user.user_id !== req.query.user_id) {
+					// if auth is specified, require that user_id matches
+					replyError(res, 'Invalid user_id specified.');
+				} else {
+					replySuccess(res, data);
+				}
+			} catch (e) {
+				replyError(res, 'There was an error with the response from the crunchyroll server');
+				console.log(`Error in parsing the response: ${e}`);
 			}
 		}).on('error', error => {
 			console.log(`Error fetching ${options.url}: ${error}`);
