@@ -2,12 +2,7 @@
 const express = require('express');
 const request = require('request');
 const helmet = require('helmet');
-const RateLimit = require('express-rate-limit');
-const limiter = new RateLimit({
-	windowMs: 30 * 60 * 1000,
-	max: 20,
-	delayMs: 0
-});
+
 const app = express();
 
 const knownVersions = ['1.0', '1.1'];
@@ -77,7 +72,6 @@ app.disable('view cache');
 // use the middleware
 app.use(helmet());
 app.use(helmet.noCache());
-app.use(limiter);
 app.get('/start_session', (req, res) => {
 	// default version if none specified: 1.0
 	let version = req.query.version;
