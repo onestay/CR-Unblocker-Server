@@ -1,33 +1,31 @@
-// ==== DECLARATIONS ==== //
 const express = require('express');
-const request = require('request');
+// const request = require('request');
+const axios = require('axios');
 const helmet = require('helmet');
-
+const qs = require('querystring');
 const app = express();
 
+const URL = 'https://api.crunchyroll.com/start_session.0.json';
 const knownVersions = ['1.0', '1.1'];
 
-
-// ==== FUNCTIONS ==== //
 /**
  * Set the options for querying CR
  * @param  {Response} query Query from the url
  * @return {Object}     Options for the query to CR
  */
 function setOptions(query) {
-	let options = {
-		url: 'https://api.crunchyroll.com/start_session.0.json',
-		qs: {
-			version: '1.0', // eslint-disable-line
-			access_token: 'Scwg9PRRZ19iVwD', // eslint-disable-line
-			device_type: 'com.crunchyroll.crunchyroid', // eslint-disable-line
-			device_id: generateId() // eslint-disable-line
-		}
+	let querystring = {
+		version: '1.0',
+		access_token: 'Scwg9PRRZ19iVwD', // eslint-disable-line
+		device_type: 'com.crunchyroll.crunchyroid', // eslint-disable-line
+		device_id: generateId() // eslint-disable-line
 	};
+
 	if (query.auth) {
-		options.qs.auth = query.auth;
+		querystring.auth = query.auth;
 	}
-	return options;
+
+	return querystring;
 }
 
 /**
@@ -97,26 +95,36 @@ app.get('/start_session', (req, res) => {
 			replyError(res, 'Logging in with an auth token requires the user_id parameter.');
 			return;
 		}
+
 		let options = setOptions(req.query);
-		request(options, (error, response, body) => {
-			try {
-				let data = JSON.parse(body);
-				if (data.error) {
-					replySuccess(res, data);
-				} else if (req.query.auth && data.data.user !== null && data.data.user.user_id !== req.query.user_id) {
+
+		axios(`${URL}?${qs.stringify(options)}`)
+			.then((result) => {
+				const body = result.data;
+				if (body.error) {
+					replySuccess(res, body);
+					return;
+				} else if (body.data.user && req.query.auth && body.data.user.user_id !== req.query.user_id) {
 					// if auth is specified, require that user_id matches
-					replyError(res, 'Invalid user_id specified.');
-				} else {
-					replySuccess(res, data);
+					replyError(res, 'Invalid user ID');
+					return;
 				}
-			} catch (e) {
-				replyError(res, 'There was an error with the response from the crunchyroll server');
-				console.log(`Error in parsing the response: ${e}`);
-			}
-		}).on('error', error => {
-			console.log(`Error fetching ${options.url}: ${error}`);
-			replyError(res, error);
-		});
+
+				replySuccess(res, result.data);
+			})
+			.catch((e) => {
+				if (e.response) {
+					// server replied with non 200 range status code or with an error
+					replyError(res, e.response.data);
+					console.log(`Crunchyroll api returned a non 200 status code: ${e.response.data}`);
+					return;
+				} else {
+					replyError(res, 'Something went wrong with the request');
+					console.log(`Something went wrong with the request:`);
+					console.log(e);
+					return;
+				}
+			});
 	}
 });
 app.get('*', (req, res) => {
