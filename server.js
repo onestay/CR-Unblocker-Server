@@ -72,10 +72,8 @@ app.use(helmet());
 app.use(helmet.noCache());
 app.get('/start_session', (req, res) => {
 	// default version if none specified: 1.0
-	let version = req.query.version;
-	if (version === undefined) {
-		version = '1.0';
-	}
+	let version = req.query.version || '1.0';
+
 	// validate version against whitelist
 	if (knownVersions.indexOf(version) === -1) {
 		replyError(res, 'Invalid API version specified.');
