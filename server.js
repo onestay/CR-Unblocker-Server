@@ -25,6 +25,10 @@ function setOptions(query) {
 		querystring.auth = query.auth;
 	}
 
+	if(query.device_id && (query.device_id !== "" | query.device_id !== undefined | query.device_id !== null)){
+		querystring.device_id = query.device_id;
+	}
+
 	return querystring;
 }
 
