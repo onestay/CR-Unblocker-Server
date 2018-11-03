@@ -74,6 +74,7 @@ describe('/start_session', () => {
 				}
 				res.should.have.status(200);
 				res.body.should.have.property('data');
+				res.body.should.have.nested.property('data.device_id').eql('abc123test');
 				res.body.should.have.property('error').eql(false);
 				res.body.should.have.property('code').eql('ok');
 				done();
