@@ -53,7 +53,7 @@
 		"array-bracket-spacing": "error",
 		"block-spacing": "error",
 		"brace-style": ["error", "1tbs", { "allowSingleLine": true }],
-		"camelcase": "error",
+		"camelcase": ["error", { "allow": [ "device_id" ] }],
 		"comma-dangle": "error",
 		"comma-spacing": "error",
 		"comma-style": "error",

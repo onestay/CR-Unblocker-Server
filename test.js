@@ -65,4 +65,19 @@ describe('/start_session', () => {
 				done();
 			});
 	});
+	it('should return a valid session id with device_id provided', (done) => {
+		chai.request(server)
+			.get('/start_session?version=1.1&device_id=abc123test')
+			.end((err, res) => {
+				if (err) {
+					done(`Server returned an error: ${err}`);
+				}
+				res.should.have.status(200);
+				res.body.should.have.property('data');
+				res.body.should.have.nested.property('data.device_id').eql('abc123test');
+				res.body.should.have.property('error').eql(false);
+				res.body.should.have.property('code').eql('ok');
+				done();
+			});
+	});
 });
