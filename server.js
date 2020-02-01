@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const qs = require('querystring');
 const app = express();
 
-const URL = 'https://api.crunchyroll.com/start_session.0.json';
+const URL = 'https://api.crunchyroll.com/start_session.1.json';
 const knownVersions = ['1.0', '1.1'];
 
 /**
@@ -15,8 +15,8 @@ const knownVersions = ['1.0', '1.1'];
  */
 function setOptions(query) {
 	let querystring = {
-		version: '1.0',
-		access_token: 'Scwg9PRRZ19iVwD', // eslint-disable-line
+		version: '457',
+		access_token: 'WveH9VkPLrXvuNm', // eslint-disable-line
 		device_type: 'com.crunchyroll.crunchyroid', // eslint-disable-line
 		device_id: generateId() // eslint-disable-line
 	};
